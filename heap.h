@@ -2,6 +2,7 @@
 #define HEAP_H
 #include <functional>
 #include <stdexcept>
+#include <vector>
 
 template <typename T, typename PComparator = std::less<T> >
 class Heap
@@ -62,13 +63,69 @@ public:
 private:
   /// Add whatever helper functions and data members you need below
 
-
-
+  int n_;
+  PComparator c_;
+  std::vector<T> heap_;
+  void heapify_(int loc);
 
 };
 
 // Add implementation of member functions here
 
+template <typename T, typename PComparator>
+Heap<T,PComparator>::Heap(int m, PComparator c){
+  n_ = m;
+  c_ = c;
+}
+
+template <typename T, typename PComparator>
+Heap<T,PComparator>::~Heap(){
+
+}
+
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::push(const T& item){
+  heap_.push_back(item);
+
+  for(int i = heap_.size() - 1; i != 0; ){
+    T& curr = heap_[i];
+    T& root = heap_[(i - 1)/n_];
+    if(c_(curr, root) == false){
+      break;
+    }
+    std::swap(curr, root);
+    i = (i-1)/n_;
+
+  }
+
+}
+template <typename T, typename PComparator>
+void Heap<T,PComparator>::heapify_(int loc){
+
+    int l = 2 * loc + 1;
+
+    if(l >= heap_.size()){
+      return;
+    }
+    else{
+      int r = l;
+      if(c_(heap_[r], heap_[l])){
+        l = r;
+      }
+    }
+}
+
+template <typename T, typename PComparator>
+bool Heap<T, PComparator>::empty() const
+{
+  return heap_.empty();
+}
+
+template <typename T, typename PComparator>
+size_t Heap<T, PComparator>::size() const
+{
+  return heap_.size();
+}
 
 // We will start top() for you to handle the case of 
 // calling top on an empty heap
@@ -81,14 +138,11 @@ T const & Heap<T,PComparator>::top() const
     // ================================
     // throw the appropriate exception
     // ================================
-
-
+    throw std::underflow_error("Empty");
   }
   // If we get here we know the heap has at least 1 item
   // Add code to return the top element
-
-
-
+return heap_[0];
 }
 
 
@@ -102,9 +156,11 @@ void Heap<T,PComparator>::pop()
     // throw the appropriate exception
     // ================================
 
-
+    throw std::underflow_error("Empty");
   }
-
+  std::swap(heap_[0], heap_[heap_.size() -1]);
+  heap_.pop_back();
+  heapify_(0);
 
 
 }
